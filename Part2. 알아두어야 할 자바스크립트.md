@@ -10,7 +10,7 @@
 
 - ES2015 이상의 자바스크립트를 통틀어 ES2015+라고 하겠음.
 
-- 6 버전부터는 ES2015 문법을 사용할 수 있다.
+- 노드 6 버전부터는 ES2015 문법을 사용할 수 있다.
 <br>
 
 ### 2. const, let
@@ -203,4 +203,139 @@ relationship2.logFriends();
 
 - 상위 스코프의 this를 그대로 내려받는다고 이해하면 됨.
 <br>
+
+### 6. 구조분해 할당
+
+- 구조분해 할당을 사용하면 객체와 배열로부터 속성이나 요소를 쉽게 꺼낼 수 있음.
+
+- 다음은 객체의 속성을 같은 이름의 변수에 대입하는 코드이다.
+
+**기존 버전**
+````javascript
+var candyMachine = {
+  status : {
+    name: 'node',
+    count: 5,
+  },
+  getCandy: function() {
+  this.status.count--;
+  return this.status.count;
+  },
+};
+var getCandy = candyMachine.getCandy;
+var count = candyMachine.status.count;
+````
+
+**ES2015+ 버전**
+````javascript
+const candyMachine = {
+  status : {
+    name: 'node',
+    count: 5,
+  },
+  getCandy() {
+  this.status.count--;
+  return this.status.count;
+  },
+};
+const { getCandy, status: { count } } = candyMachine; // getCandy 와 count 변수 초기화
+````
+- candyMachine 객체 안의 속성을 찾아서 변수와 매칭함.
+
+- count와 같이 여러 단계 안의 속성도 찾을 수 있음. ( candyMacine > status > count )
+
+- 배열에 대한 구조분해 할당 문법도 존재함.
+
+**기존 버전**
+````javascript
+var array = [ 'node.js', {}, 10, true ];
+var node = array[0];
+var obj = array[1];
+var bool = array[3];
+````
+
+**ES2015+ 버전**
+````javascript
+const array = [ 'node.js', {}, 10, true ];
+const [node, obj, , bool ] = array;
+````
+<br>
+
+### 7. 클래스
+
+- 클래스 문법도 추가. 하지만 다른 언어처럼 클래스 기반으로 동작하는 것이 아니라 프로토타입 기반으로 동작함.
+
+- 보기 좋게 클래스로 바꾼 것이라고 이해하면 된다.
+
+**프로토타입 상속 예제 코드**
+````javascript
+var Human = function(type) {
+  this.type = type || 'human';
+};
+
+Human.isHuman = function(human) {
+  return human instanceof Human; // human이 Human에 속하거나 Human을 상속받는 클래스에 속하면 true가 반환됩니다.
+}
+
+// Human.prototype이라는 빈 Object가 어딘가에 존재하고, Human 함수로부터 생성된 객체들은 어딘가에 존재하는 Object에 들어있는 값을 모두 갖다쓸 수 있습니다. 함수도 마찬가지.
+Human.prototype.breath = function() { 
+  alert('h-a-a-a-m');
+};
+
+var Zero = function(type, firstName, lastName) {
+  Human.apply(this, arguments);
+  this.firstName = firstName;
+  this.lastName = lastName;
+};
+
+Zero.prototype = Object.create(Human.prototype);
+Zero.prototype.constructor = Zero; // 상속하는 부분
+Zero.prototype.sayName = function() {
+  alert(this.firstName + ' ' + this.lastName);
+};
+var oldZero = new Zero('human', 'Zero', 'Cho');
+Human.isHuman(oldZero); // true
+````
+
+- Human 생성자 함수가 있고, 그 함수를 Zero 생성자 함수가 상속한다. 뭔가 어설픈 느낌 ...
+
+**클래스 기반 코드**
+````javascript
+class Human {
+  constructor(type = 'human') {
+    this.type = type;
+  }
+  
+  static isHuman(human) { // 클래스 함수
+    return human instanseof Human;
+  }
+  
+  breathe() {
+    alert('h-a-a-a-m');
+  }
+}
+
+class Zero extends Human { // 상속 문법
+  constructor(type, firstName, lastName) {
+  super(type); // Human.constructor
+  this.firstName = firstName;
+  this.lastName = lastName;
+  }
+
+  sayName() {
+    super.breathe();
+    alert(`${this.firstName} ${this.lastName}`);
+  }
+}
+
+const newZero = new Zero('human', 'Zero', 'Cho');
+Human.isHuman(newZero); // true
+````
+
+- 전반적으로 class 안으로 그룹화 됨. 생성자 함수는 constructor 함수로 들어감. (super)
+
+- 다만 이렇게 클래스 문법으로 바뀌었더라도 자바 스크립트는 프로토타입 기반으로 동작한다는 것을 명심하자 !
+<br>
+
+### 8. 프로미스
 
