@@ -339,3 +339,10 @@ Human.isHuman(newZero); // true
 
 ### 8. 프로미스
 
+- 자바 스크립트와 노드에서는 주로 비동기를 접한다. 특히 이벤트 리스너를 사용할 때 콜백 함수를 자주 사용.
+
+- ES2015+ 는 자바 스크립트와 노드의 API들이 콜백 대신 프로미스 기반으로 재구성되며, 콜백 지옥 현상을 극복했다는 평가를 받고 있다.
+
+````javascript
+const condition = true // true면 resolve, false면 reject
+````
