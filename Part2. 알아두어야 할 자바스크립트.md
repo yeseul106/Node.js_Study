@@ -420,4 +420,147 @@ promise
 
 **콜백 함수 버전**
 ````javascript
+function findAndSaveUser(Users) {
+  Users.findOne({}, (err, user) => { // 첫 번째 콜백
+    if (err) {
+      return console.error(err);
+    }
+    user.name = 'zero';
+    user.save((err) => { // 두 번째 콜백
+      if (err) {
+        return console.error(err);
+      }
+      Users.findOne({ gender: 'm' }, (err, user) => { // 세 번째 콜백
+      // 생략
+      });
+    });
+  });
+}
 ````
+
+- 콜백 함수가 세 번 중첩되어 있다. 이는 콜백 함수가 나올 때마다 코드의 깊이가 깊어지는 것을 알 수 있다.
+
+- 또한 콜백 함수마다 에러도 따로 처리해줘야 해서 복잡하다.
+
+**promise 객체 사용**
+````javascript
+function findAndSaveUser(Users) {
+  Users.findOne({})
+    .then((user) => {
+      user.name = 'zero';
+      return user.save();
+    })
+    .then((user) => {
+      return Users.findOne({ gender: 'm' });
+    })
+    .then((user) => {
+    //생략
+    })
+    .catch(err => {
+      console.error(err);
+    });
+}
+````
+- 위 코드에서 then 메서드들은 순차적으로 실행된다. 에러도 마지막 catch에서 한 번에 처리할 수 있음.
+
+- 모든 콜백 함수를 위와 같이 바꿀 수 있는 것은 아니고, 메서드가 프로미스 방식을 지원해야 가능하다.
+  
+- 예제 코드에서는 findOne과 save 메서드가 내부적으로 프로미스 객체를 가지고 있다고 가정함.
+  - new Promise가 함수 내부에 구현되어 있어야 함.
+
+**프로미스 여러 개를 한번에 실행하는 코드**
+````javascript
+const promise1 = Promise.resolve('성공1'); // 즉시 resolve하는 프로미스를 만드는 방법
+const promise2 = Promise.resolve('성공2');
+Promise.all([promise1, promise2])
+  .then((result) => {
+    console.log(result); // ['성공1', '성공2'];
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+````
+- 프로미스가 여러 개 있을 때 Promise.all에 넣으면 모두 resolve 될 때까지 기다렸다가 then으로 넘어간다.
+
+- result 매개변수에 각각의 프로미스 결과값이 배열로 들어가있음.
+
+- Promise 중 하나라도 reject가 되면 catch로 넘어간다.
+<br>
+
+ ### 9. async/await
+ 
+- 노드 7.6 버전부터 지원되는 기능이다. ES2017에서 추가되었으며, 알아두면 정말 편리한 기능이다.
+
+- 프로미스가 콜백 지옥을 해결했다고 하지만 then과 catch가 계속 반복되기 때문에 여전히 코드가 장황하다. 이를 async/await 문법으로 프로미스를 사용하여 깔끔하게 줄일 수 있다.
+
+**2.1.8절의 프로미스 코드**
+````javascript
+function findAndSaveUser(Users) {
+  Users.findOne({})
+    .then((user) => {
+      user.name = 'zero';
+      return user.save();
+    })
+    .then((user) => {
+      return Users.findOne({ gender: 'm' });
+    })
+    .then((user) => {
+    //생략
+    })
+    .catch(err => {
+      console.error(err);
+    });
+}
+````
+
+**async/await 문법 사용 코드**
+````javascript
+async function findAndSaveUser(Users) {
+  try {
+    let user = await Users.findOne({});
+    user.name = 'zero';
+    user = await user.save();
+    user = await Users.findOne({ gender : 'm' });
+    // 생략
+  } catch(error) {
+    console.error(error);
+  }
+}
+````
+- 함수 선언부를 일반 함수 대신 async function으로 교체하고, 프로미스 앞에 await을 붙인다.
+
+- 이는 해당 프로미스가 resolve 될 때까지 기다린 뒤 다음 로직으로 넘어간다.
+  - 예를 들면, await Users.findOne({})이 resolve될 때까지 기다린 다음에 user 변수를 초기화한다.
+
+- 에러 처리를 위해 try/catch문으로 로직을 감싼다.
+
+**화살표 함수로 async 쓰기**
+````javascript
+const findAndSaveUser = async (Users) => {
+  try {
+    let user = await Users.findOne({});
+    user.name = 'zero';
+    user = await user.save();
+    user = await Users.findOne({ gender : 'm' });
+    // 생략
+  } catch(error) {
+    console.error(error);
+  }
+};
+````
+
+- for문과 async/await문을 같이 써서 프로미스를 순차적으로 실행할 수 있다. for문과 함께 쓰는 것은 노드 10 버전부터 지원하는 ES2018 문법이다.
+````javascript
+const promise1 = Promise.resolve('성공1'); 
+const promise2 = Promise.resolve('성공2');
+(async () => {
+  for await (promise of [promise1, promise2]) {
+    console.log(promise);
+  }
+})();
+````
+
+- for await of 문을 이용해서 프로미스 배열을 순회하는 코드이다. async 함수의 반환값은 항상 Promise로 감싸진다.
+
+- 따라서, 실행 후 then을 붙이거나 또 다른 async 함수 안에서 await을 붙여 처리할 수 있다.
+<br>
