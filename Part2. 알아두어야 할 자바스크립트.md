@@ -341,8 +341,83 @@ Human.isHuman(newZero); // true
 
 - 자바 스크립트와 노드에서는 주로 비동기를 접한다. 특히 이벤트 리스너를 사용할 때 콜백 함수를 자주 사용.
 
+> **비동기?**
+> - 특정 코드의 실행이 완료될 때까지 **기다리지 않고** 다음 코드를 먼저 수행하는 자바스크립트의 특성
+<br>
+
 - ES2015+ 는 자바 스크립트와 노드의 API들이 콜백 대신 프로미스 기반으로 재구성되며, 콜백 지옥 현상을 극복했다는 평가를 받고 있다.
 
 ````javascript
 const condition = true // true면 resolve, false면 reject
+const promise = new Promise(resolve, reject) => { // 프로미스 객체 생성
+  if (condition) {
+    resolve('성공');
+  } else {
+    reject('실패');
+  }
+});
+
+// 다른 코드가 들어갈 수 있음
+
+promise
+  .then((message) => {
+    console.log(message); // 성공(resolve)한 경우 실행
+  })
+  .catch((error) => {
+    console.error(error); // 실패(reject)한 경우 실행
+  })
+  .finally(() => { // 끝나고 무조건 실행
+    console.log('무조건');
+  });
+````
+
+- new Promise로 프로미스를 생성할 수 있으며, 그 내부에 resolve와 reject를 매개변수로 갖는 콜백 함수를 넣는다.
+
+- 프로미스 내부에서 resolve가 호출되면 -> then이 실행 / reject가 호출되면 catch가 실행
+
+- finally 부분은 성공/실패 여부와 상관없이 실행
+
+- resolve와 reject에 넣어준 인수는 각각 then과 catch의 매개변수에서 받을 수 있음.
+  - resolve('성공')이 호출되면 then의 message가 '성공'이 됨.
+
+  - reject('실패')가 호출되면 catch의 error가 '실패'가 됨.
+
+  - condition 변수를 false로 바꿔보면 catch에서 에러가 로깅된다.
+
+- 프로미스를 쉽게 설명하자면, **_실행은 바로 하되 결과값은 나중에 받는 객체_** 이다. 
+  - 결과값은 실행이 완료된 후 then이나 catch 메서드를 통해 받는다.
+
+````javascript
+promise
+  .then((message) => {
+    return new Promise((resolve, reject) => {
+      resolve(message);
+    });
+  })
+  .then((message2) => {
+    console.log(message2);
+    return new Promise((resolve, reject) => {
+      resolve(message2);
+    });
+  })
+  .then((message3) => {
+    console.log(message3);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+````
+- 위와 같이 then이나 catch에서 다시 다른 then이나 catch를 붙일 수 있다.
+  - 이전 then의 return 값을 다음 then의 매개변수로 넘긴다. 프로미스를 return한 경우에는 프로미스가 수행된 후 다음 then이나 catch가 호출됨.
+
+- 처음 then에서 message를 resolve하면 다음 then에서 message2로 받을 수 있음.
+
+- 여기서 다시 message2를 resolve한 것을 다음 then에서 message3으로 받음.
+
+- 단, then에서 new Promise를 return 해야 다음 then에서 받을 수 있다는 것을 기억해야 한다.
+
+- 이를 이용해서 콜백을 프로미스로 바꿀 수 있다.
+
+**콜백 함수 버전**
+````javascript
 ````
