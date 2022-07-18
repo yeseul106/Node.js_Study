@@ -564,3 +564,8 @@ const promise2 = Promise.resolve('성공2');
 
 - 따라서, 실행 후 then을 붙이거나 또 다른 async 함수 안에서 await을 붙여 처리할 수 있다.
 <br>
+
+## 2.2 프런트엔드 자바스크립트
+    user.name = 'zero';ㅂ
+    user.name = 'zero';ㅌ
+    user.name = 'zero';
