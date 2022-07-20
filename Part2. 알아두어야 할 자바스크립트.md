@@ -566,6 +566,58 @@ const promise2 = Promise.resolve('성공2');
 <br>
 
 ## 2.2 프런트엔드 자바스크립트
-    user.name = 'zero';ㅂ
-    user.name = 'zero';ㅌ
-    user.name = 'zero';
+----
+
+### 1. AJAX
+
+- AJAX (Asynchronous Javascript And XML)은 비동기적 웹 서비스를 개발할 때 사용하는 기법이다.
+
+- XML을 꼭 사용하지 않아도 되며, 요즘에는 JSON을 많이 사용한다.
+
+- 쉽게 말해 페이지 이동 없이 서버에 요청을 보내고 응답을 받는 기술이다.
+
+- 웹 사이트 중에서 페이지 전환 없이 새로운 데이터를 불러오는 사이트는 대부분 AJAX 기술을 사용함.
+
+- 보통 AJAX 요청은 jQuery나 axios 같은 라이브러리를 이용해서 보낸다. 
+  - 브라우저에서 기본적으로 XMLHttpRequest 객체를 제공하긴 하지만, 사용 방법이 복잡하고 서버에서는 사용할 수 없으므로 전반적으로 axios를 사용함.
+
+- 프런트엔드에서 사용하려면 아래 코드처럼 HTML 파일을 하나 만들고 그 안에 script 태그를 추가해야한다.
+
+````html
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+  // 여기에 예제 코드를 넣으세요.
+</script>
+````
+
+**GET 요청 코드**
+````javascript
+axios.get('https://www.zerocho.com/api/get')
+  .then((result) => {
+    console.log(result);
+    console.log(result.data); // {}
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+````
+- axios.get도 내부에 new Promise가 들어 있으므로 then가 catch를 사용할 수 있다.
+
+- result.data에는 서버로부터 보낸 데이터가 들어있다. 
+
+- 프로미스이므로 async/await 방식으로 변경할 수 있다. 익명 함수라서 즉시 실행을 위해 코드를 소괄호로 감사서 호출했다.
+````javascript
+(async () => {
+  try {
+    const result = await axios.get('https://www.zerocho.com/api/get');
+    console.log(result);
+    console.log(result.data); // {}
+  } catch((error) {
+    console.error(error);
+  }
+})();
+````
+
+**POST 요청 코드**
+
+
