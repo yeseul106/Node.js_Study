@@ -636,6 +636,7 @@ axios.get('https://www.zerocho.com/api/get')
 - 전체적인 구조는 비슷한데 두 번째 인수로 데이터를 넣어 보내는 것이 다르다.
 
 - GET 요청이면 axios.get을, POST 요청이면 axios.post를 사용한다.
+<br>
 
 ### 2. FormData
 
@@ -680,6 +681,7 @@ formData.getAll('item'); //['apple']
   }
 })();
 ````
+<br>
 
 ### 3. encodeURIComponent, decodeURIComponent
 
@@ -707,6 +709,7 @@ formData.getAll('item'); //['apple']
 decodeURIComponent('%EB%85%B8%EB%93%9C'); //노드
 ````
 - 한글이 다시 원래 상태로 복구됨.
+<br>
 
 ### 4. 데이터 속성과 dataset
 
